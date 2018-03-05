@@ -86,7 +86,7 @@ SeaWinds <- SeaWinds/maxValue(SeaWinds)#normalize Seawinds
 
 ## NDVI -----------------------------------------------------------------------------------------
 product<-"MOD13A2" #Vegetation Indices 16-Day L3 Global 1km: https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod13a2
-SDSstring="1"
+SDSstring="100000000000"
 outDirPath = "NDVI"
 scale.factor =0.0001
 
@@ -217,7 +217,7 @@ sanui <- (1-ndviPositive)*SeaWinds*ols.norm
 #' @examples
 fvanui<-function(ndvi,ols){
   if (length(ndvi[ndvi<0]>0)){
-    stop("ndvi contains negative values" )
+    stop("NDVI contains negative values" )
   }
   
   if (minValue(ols)<0 || maxValue(ols) > 1){
@@ -227,7 +227,6 @@ fvanui<-function(ndvi,ols){
   if (minValue(ndvi)<0 || maxValue(ndvi) > 1){
     stop("NDVI raster is not [0-1] normalized" )
   }
-  
   
   vanui<-(1-ndvi)*(ols)
 }
@@ -260,7 +259,20 @@ write.csv(as.data.frame(cor$`pearson correlation coefficient`), "pearson.PC1.csv
 
 ##  L*(1-variance(V))*(1-variance(T)) ----------------------------------------------------------------
 
-var.method<-ols*(1-calc(stack(unlist(ndvi.rasters)), fun=var))*(1-calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var))
+png(filename="ols.norma.png")
+plot(ols.norm)
+dev.off()
+
+png(filename="var.ndvi.png")
+plot(calc(stack(unlist(ndvi.rasters)), fun=var))
+dev.off()
+
+
+png(filename="var.lst.png")
+plot(calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var))
+dev.off()
+
+var.method<-ols.norm*(1-calc(stack(unlist(ndvi.rasters)), fun=var))*(1-calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var))
 
 layers<-stack(viirs, ols_cal, var.method)
 names(layers)<-c('viirs', 'ols_cal', 'var.method')
