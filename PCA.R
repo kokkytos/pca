@@ -264,15 +264,15 @@ plot(ols.norm)
 dev.off()
 
 png(filename="var.ndvi.png")
-plot(calc(stack(unlist(ndvi.rasters)), fun=var))
+plot(calc(stack(unlist(ndvi.rasters)), fun=var, na.rm=T))
 dev.off()
 
 
 png(filename="var.lst.png")
-plot(calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var))
+plot(calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var, na.rm=T))
 dev.off()
 
-var.method<-ols.norm*(1-calc(stack(unlist(ndvi.rasters)), fun=var))*(1-calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var))
+var.method<-ols.norm*(1-calc(stack(unlist(ndvi.rasters)), fun=var, na.rm=T))*(1-calc(stack(sapply(unlist(lst.days), function(x) x/maxValue(x))), fun=var, na.rm=T))
 
 layers<-stack(viirs, ols_cal, var.method)
 names(layers)<-c('viirs', 'ols_cal', 'var.method')
